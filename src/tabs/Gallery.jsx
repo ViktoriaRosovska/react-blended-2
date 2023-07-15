@@ -1,7 +1,7 @@
 import { Component } from 'react';
 
 import * as ImageService from 'service/image-service';
-import { Button, SearchForm, Grid, GridItem, Text, CardItem } from 'components';
+import { Button, SearchForm, Grid, GridItem, Text, CardItem, Loader } from 'components';
 
 export class Gallery extends Component {
   state = {
@@ -10,11 +10,14 @@ export class Gallery extends Component {
     images: [],
     isEmpty: false,
     showBtn: false,
+    isError: '',
+    isLoading: false,
   };
 
   componentDidUpdate(_, prevState) {
     const { query, page } = this.state;
     if (prevState.query !== query || prevState.page !== page) {
+      this.setState({ isLoading: true })
       ImageService.getImages(query, page).then(({ photos, total_results }) => {
         if (photos.length === 0) {
           this.setState({ isEmpty: true });
@@ -24,12 +27,17 @@ export class Gallery extends Component {
           images: [...prevState.images, ...photos],
           showBtn: page < Math.ceil(total_results / 15),
         }));
-      });
+      }).catch((error) => { this.setState({ isError: error.message }) }).finally(() => {
+        this.setState({ isLoading: false })
+      })
     }
   }
 
   onHandleSubmith = query => {
-    this.setState({ query, page: 1, images: [], isEmpty: false });
+    this.setState({
+      query, page: 1, images: [], isEmpty: false, showBtn: false,
+      isError: '',
+    });
   };
 
   handleClick = () => {
@@ -37,7 +45,7 @@ export class Gallery extends Component {
   };
 
   render() {
-    const { images, isEmpty, showBtn } = this.state;
+    const { images, isEmpty, showBtn, isError, isLoading } = this.state;
     return (
       <>
         <SearchForm onHandleSubmit={this.onHandleSubmith} />
@@ -53,7 +61,11 @@ export class Gallery extends Component {
         {isEmpty && (
           <Text textAlign="center">Sorry. There are no images ... 😭</Text>
         )}
+        {isError && (
+          <Text textAlign="center">Sorry. {isError} ... 😭</Text>
+        )}
         {showBtn && <Button onClick={this.handleClick}>Load more</Button>}
+        {isLoading && <Loader />}
       </>
     );
   }

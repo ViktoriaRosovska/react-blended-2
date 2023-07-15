@@ -1,8 +1,8 @@
 {
-  "name": "react-homework-template",
+  "name": "react-blended-2",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://goitacademy.github.io/react-homework-template/",
+  "homepage": "https://ViktoriaRosovska.github.io/react-blended-2/",
   "dependencies": {
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
